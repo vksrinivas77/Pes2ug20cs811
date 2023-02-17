@@ -3,18 +3,24 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'g-- ./main/PES2UG20CS811.cpp'
+        sh 'mvn clean install'
         echo 'Build Stage Successful'
       }
     }
     stage('Test') {
       steps {
-        sh './a.out'
+        sh 'mvn test'
         echo 'Test Stage Successful'
+        post {
+        always{
+        junit 'target/surfire-reports/*.xml'
+        }
+        }
       }
     }
     stage('Deploy') {
       steps {
+      sh 'mvn deploy'
         echo 'Deployment Successful'
       }
     }
