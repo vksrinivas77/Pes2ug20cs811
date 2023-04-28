@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Online Voting Management System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <style>
+        /* Background */
+        
+        body {
+            background-color: #F8F8F8;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+        }
+        /* Container */
+        
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Heading */
+        
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #424242;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        /* Buttons */
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            text-transform: uppercase;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #2196F3;
+            border-color: #2196F3;
+            color: #FFFFFF;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1976D2;
+            border-color: #1976D2;
+        }
+        
+        .btn-danger {
+            background-color: #F44336;
+            border-color: #F44336;
+            color: #FFFFFF;
+        }
+        
+        .btn-danger:hover {
+            background-color: #D32F2F;
+            border-color: #D32F2F;
+        }
+        /* Table */
+        
+        .table {
+            border: none;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #FFFFFF;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .table thead {
+            background-color: #EEEEEE;
+            color: #212121;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+        
+        .table td {
+            font-weight: 500;
+            color: #424242;
+        }
+        
+        .table-striped tbody tr:nth-of-type(even) {
+            background-color: #F5F5F5;
+        }
+        /* Pagination */
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .pagination li {
+            margin: 0 5px;
+        }
+        
+        .pagination li a {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background-color: #EEEEEE;
+            color: #212121;
+            transition: background-color 0.3s ease;
+        }
+        
+        .pagination li a:hover {
+            background-color: #2196F3;
+            color: #FFFFFF;
+        }
+        
+        .navbar-center {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .navbar-center center {
+            display: flex;
+        }
+        
+        .navbar-center button {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container my-2">
+        <h1>Votings List</h1>
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-center">
+            <center>
+                <a th:href="@{/}">
+                    <button class="btn btn-outline-success ">Voters</button>
+                </a>
+                <a th:href="@{/candidate}">
+                    <button class="btn btn-outline-success active">Candidates</button>
+                </a>
+                <a th:href="@{/clear}">
+                    <button class="btn btn-outline-success">Clear</button>
+                </a>
+            </center>
+        </nav>
+
+        <a th:href="@{/showNewCandidateForm}" class="btn btn-primary btn-sm mb-3"> Add Candidate </a>
+
+        <table border="1" class="table table-striped table-responsive-md">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Party</th>
+                    <th>Age</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="Voting : ${listCandidate}">
+                    <td th:text="${Voting.id}"></td>
+                    <td th:text="${Voting.CandidateName}"></td>
+                    <td th:text="${Voting.CandidatePartyName}"></td>
+                    <td th:text="${Voting.CandidateAge}"></td>
+                    <td> <a th:href="@{/showFormForCandidateUpdate/{id}(id=${Voting.id})}" class="btn btn-primary">Update</a>
+                        <a th:href="@{/deleteCandidate/{id}(id=${Voting.id})}" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${totalPages > 1}">
+            <div class="row col-sm-10">
+                <div class="col-sm-2">
+                    Total Rows: [[${totalItems}]]
+                </div>
+                <div class="col-sm-1">
+                    <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+            <a th:if="${currentPage != i}"
+              th:href="@{'/candidatepage/' + ${i}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]</a>
+            <span th:unless="${currentPage != i}">[[${i}]]</span> &nbsp; &nbsp;
+                    </span>
+                </div>
+                <div class="col-sm-1">
+                    <a th:if="${currentPage < totalPages}" th:href="@{'/votingpage/' + ${currentPage + 1}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Next</a>
+                    <span th:unless="${currentPage < totalPages}">Next</span>
+                </div>
+
+                <div class="col-sm-1">
+                    <a th:if="${currentPage < totalPages}" th:href="@{'/votingpage/' + ${totalPages}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Last</a>
+                    <span th:unless="${currentPage < totalPages}">Last</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
